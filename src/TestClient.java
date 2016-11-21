@@ -2,6 +2,8 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.awt.*;
+
 public class TestClient {
     public static void main(String[] args) {
         // read the n points from a file
@@ -24,8 +26,8 @@ public class TestClient {
         StdDraw.show();
 
         // print and draw the line segments
-        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
-        for (LineSegment segment : collinear.segments()) {
+        FastCollinearPoints fcols = new FastCollinearPoints(points);
+        for (LineSegment segment : fcols.segments()) {
             StdOut.println(segment);
             segment.draw();
         }
