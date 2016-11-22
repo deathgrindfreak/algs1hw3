@@ -55,8 +55,8 @@ public class Point implements Comparable<Point> {
      */
     public int compareTo(Point that) {
         if (this.y == that.y)
-            return Integer.compare(this.x, that.x);
-        return Integer.compare(this.y, that.y);
+            return this.x - that.x;
+        return this.y - that.y;
     }
 
     /**
@@ -72,8 +72,8 @@ public class Point implements Comparable<Point> {
                 double slope1 = slopeTo(o1);
                 double slope2 = slopeTo(o2);
                 if (slope1 < slope2)
-                    return 1;
-                return slope1 == slope2 ? 0 : -1;
+                    return -1;
+                return slope1 == slope2 ? 0 : 1;
             }
         };
     }

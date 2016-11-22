@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class FastCollinearPoints {
@@ -23,7 +24,8 @@ public class FastCollinearPoints {
             }
 
         List<List<Point>> segs = new ArrayList<>();
-        for (Point p : points) {
+        Point[] cpy = Arrays.copyOf(points, points.length);
+        for (Point p : cpy) {
             // Sort according to slope order
             Arrays.sort(points, p.slopeOrder());
 
@@ -34,33 +36,43 @@ public class FastCollinearPoints {
                 Point n = points[i];
                 if (p.slopeTo(n) == slope) {
                     pts.add(n);
-                } else {
-                    // Need at least 2 other points to have 4 collinear points
-                    if (pts.size() >= 2) {
-                        pts.add(p);
-                        pts.add(q);
-                        Collections.sort(pts);
 
-                        // Ignore if point has already been added
-/*                        boolean add = true;
-                        for (List<Point> sg : segs)
-                            if (sg.get(0).compareTo(pts.get(0)) == 0
-                                    || sg.get(pts.size() - 1).compareTo(pts.get(pts.size() - 1)) == 0)
-                                add = false;
-                        if (add)*/
-                        segs.add(pts);
-                    }
-
-                    pts = new ArrayList<>();
-                    q = points[i];
-                    slope = p.slopeTo(q);
+                    // Continue unless on last element
+                    if (i < points.length - 1)
+                        continue;
                 }
+
+                // Need at least 2 other points to have 4 collinear points
+                if (pts.size() >= 2) {
+                    pts.add(p);
+                    pts.add(q);
+                    Collections.sort(pts);
+                    segs.add(pts);
+                }
+
+                pts = new ArrayList<>();
+                q = n;
+                slope = p.slopeTo(q);
             }
         }
 
         List<LineSegment> lSegs = new ArrayList<>();
-        for (List<Point> sg : segs)
-            lSegs.add(new LineSegment(sg.get(0), sg.get(sg.size() - 1)));
+        Comparator<List<Point>> comp = new SegmentComparator();
+        Collections.sort(segs, comp);
+
+        if (!segs.isEmpty()) {
+            List<Point> currSeg = segs.get(0);
+            lSegs.add(new LineSegment(currSeg.get(0), currSeg.get(currSeg.size() - 1)));
+            for (int i = 1; i < segs.size(); i++) {
+                List<Point> sg = segs.get(i);
+                if (comp.compare(currSeg, sg) == 0)
+                    continue;
+
+                // Add to line segments if unique
+                currSeg = sg;
+                lSegs.add(new LineSegment(sg.get(0), sg.get(sg.size() - 1)));
+            }
+        }
 
         // Set the array
         segments = lSegs.toArray(new LineSegment[lSegs.size()]);
@@ -72,5 +84,15 @@ public class FastCollinearPoints {
 
     public LineSegment[] segments() {
         return Arrays.copyOf(segments, segments.length);
+    }
+
+    private static class SegmentComparator implements Comparator<List<Point>> {
+        @Override
+        public int compare(List<Point> o1, List<Point> o2) {
+            int comp = o1.get(0).compareTo(o2.get(0));
+            if (comp == 0)
+                return o1.get(o1.size() - 1).compareTo(o2.get(o2.size() - 1));
+            return comp;
+        }
     }
 }

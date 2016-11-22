@@ -20,10 +20,15 @@ public class TestClient {
         StdDraw.enableDoubleBuffering();
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
+        StdDraw.setPenColor(Color.DARK_GRAY);
+        StdDraw.setPenRadius(.008f);
         for (Point p : points) {
             p.draw();
         }
         StdDraw.show();
+
+        StdDraw.setPenColor(Color.BLUE);
+        StdDraw.setPenRadius(.002f);
 
         // print and draw the line segments
         FastCollinearPoints fcols = new FastCollinearPoints(points);
